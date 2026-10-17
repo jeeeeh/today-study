@@ -32,13 +32,17 @@ jobs:
           curl -fsSL -o app/src/main/assets/fonts/Jua-Regular.ttf "https://github.com/google/fonts/raw/main/ofl/jua/Jua-Regular.ttf" || echo "Jua 글꼴을 받지 못했어요"
           curl -fsSL -o app/src/main/assets/fonts/Fredoka.ttf "https://github.com/google/fonts/raw/main/ofl/fredoka/Fredoka%5Bwdth,wght%5D.ttf" || echo "Fredoka 글꼴을 받지 못했어요"
       - name: APK 빌드
-        run: gradle assembleRelease --no-daemon --stacktrace
+        run: gradle assembleTabletRelease assembleMobileRelease --no-daemon --stacktrace
       - name: 파일 이름 정리
-        run: cp app/build/outputs/apk/release/app-release.apk today-study.apk
+        run: |
+          cp app/build/outputs/apk/tablet/release/app-tablet-release.apk today-study.apk
+          cp app/build/outputs/apk/mobile/release/app-mobile-release.apk today-study_for_mobile_ver1.0.apk
       - uses: actions/upload-artifact@v4
         with:
           name: today-study
-          path: today-study.apk
+          path: |
+            today-study.apk
+            today-study_for_mobile_ver1.0.apk
 
   release:
     needs: build
@@ -56,4 +60,4 @@ jobs:
           gh release create "v1.0.${{ github.run_number }}" out/*.apk \
             --repo "${{ github.repository }}" \
             --title "오늘공부 v1.0.${{ github.run_number }}" \
-            --notes "today-study.apk 를 눌러 내려받아 설치하세요. (안드로이드 태블릿·폰)"
+            --notes "태블릿: today-study.apk · 휴대폰: today-study_for_mobile_ver1.0.apk (오늘공부_for_mobile_ver1.0) 를 눌러 내려받아 설치하세요."

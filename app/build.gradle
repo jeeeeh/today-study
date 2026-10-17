@@ -36,6 +36,21 @@ android {
         }
     }
 
+    // tablet = 기존 태블릿용(같은 앱 ID라 기존 설치 위에 업데이트) · mobile = 휴대폰 세로용(별도 앱)
+    flavorDimensions 'device'
+    productFlavors {
+        tablet {
+            dimension 'device'
+            manifestPlaceholders = [orient: 'unspecified']
+        }
+        mobile {
+            dimension 'device'
+            applicationIdSuffix '.mobile'
+            versionName '1.0'
+            manifestPlaceholders = [orient: 'portrait']
+        }
+    }
+
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_17
         targetCompatibility JavaVersion.VERSION_17
