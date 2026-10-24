@@ -46,7 +46,7 @@ android {
         mobile {
             dimension 'device'
             applicationIdSuffix '.mobile'
-            versionName '1.0'
+            versionName '1.1'
             manifestPlaceholders = [orient: 'portrait']
         }
     }
