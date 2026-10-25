@@ -468,6 +468,23 @@ button{font:inherit;color:inherit;border:none;background:none;cursor:pointer;-we
   .prep{font-size:34px}
   .bgs{grid-template-columns:repeat(2,1fr)}
 }
+/* 상점 · 전설 */
+.shopm .box{max-width:760px;width:94vw}
+.wallet{font-size:24px;margin:4px 0 8px}.wallet b{font-family:var(--fe)}
+.shop{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;max-height:52vh;overflow:auto;padding:6px}
+.sitem{display:flex;flex-direction:column;align-items:center;gap:2px;border:var(--line);border-radius:18px;background:#fff;padding:8px 6px;box-shadow:var(--popS);font-size:19px}
+.sitem .si{font-size:46px;line-height:1.1}
+.sitem small{font-size:14px;color:var(--ink2)}
+.sitem .price{margin-top:4px;background:#FFE680;border:2px solid var(--ink);border-radius:999px;padding:0 10px;font-weight:700}
+.sitem.poor{opacity:.45}
+.tag.lv4{background:linear-gradient(90deg,#FF8FB8,#FFD36E,#8FE3A8,#8FD3FF,#C9A4FF);color:#fff;text-shadow:0 1px 0 rgba(0,0,0,.45)}
+.mon.leg{isolation:isolate}
+.mon.leg:before{content:"";position:absolute;inset:-6% -8%;border-radius:50%;background:conic-gradient(#FF8FB8,#FFD36E,#8FE3A8,#8FD3FF,#C9A4FF,#FF8FB8);filter:blur(14px);opacity:.6;z-index:-1;animation:legspin 4s linear infinite}
+.mon.leg svg{filter:drop-shadow(0 0 6px #fff) saturate(1.3)}
+.mon.leg:after{content:"✨";position:absolute;left:-8px;bottom:12px;font-size:22px;animation:twk 1.3s infinite}
+.result.legr{filter:drop-shadow(0 0 18px #FFD36E)}
+@keyframes legspin{to{transform:rotate(360deg)}}
+@media (max-width:600px){ .shop{grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:7px} .sitem{font-size:15px;padding:6px 4px} .sitem .si{font-size:34px} .sitem small{font-size:11px} .wallet{font-size:19px} .modal .box{min-width:0;max-width:100%} .modal .three{gap:3px} .modal .three svg{width:54px;height:54px} .modal .three .plus{font-size:24px} .modal .three .arrow{font-size:30px;margin:0 2px} .modal .three .mystery{width:70px;height:70px;font-size:38px} .modal .acts{flex-wrap:wrap} }
 </style>
 </head>
 <body>
@@ -673,6 +690,59 @@ SP_LIST.length=0; Object.keys(SP).forEach(k=>SP_LIST.push(k));
 function pickSp(){ const pool=[]; SP_LIST.forEach(k=>{ const w=SP[k].r?1:4; for(let i=0;i<w;i++) pool.push(k); }); return pick(pool); }
 function newFriend(){ return {sp:pickSp(),lv:1,h:false,sh:Math.random()<.07}; }
 
+/* ---------- 별 상점 ---------- */
+/* p.stars = 지금까지 모은 별(알 생기기 기준), p.spent = 상점에서 쓴 별 */
+function wallet(p){ return Math.max(0,(p.stars||0)-(p.spent||0)); }
+const SHOP=[
+  {id:'egg',ic:'🥚',ko:'친구 알',d:'어떤 친구가 나올까?',c:10,give:p=>{ p.friends.push(newFriend()); }},
+  {id:'rare',ic:'🦄',ko:'귀한 알',d:'귀한 친구가 꼭 나와요',c:35,give:p=>{ const f=newFriend(); const r=SP_LIST.filter(k=>SP[k].r); if(r.length) f.sp=pick(r); p.friends.push(f); }},
+  {id:'shiny',ic:'🌟',ko:'반짝 알',d:'반짝반짝 친구가 꼭 나와요',c:40,give:p=>{ const f=newFriend(); f.sh=true; p.friends.push(f); }},
+  {id:'house',ic:'🏠',ko:'작은 집',d:'마을에 집을 지어요',c:20,give:p=>{ p.friends.push({sp:'apple',kind:'obj',obj:'house',lv:2,h:true}); }},
+  {id:'windmill',ic:'🌬️',ko:'풍차',d:'빙글빙글 풍차',c:20,give:p=>{ p.friends.push({sp:'apple',kind:'obj',obj:'windmill',lv:2,h:true}); }},
+  {id:'balloon',ic:'🎈',ko:'열기구',d:'하늘을 나는 열기구',c:25,give:p=>{ p.friends.push({sp:'apple',kind:'obj',obj:'balloon',lv:2,h:true}); }},
+  {id:'ferris',ic:'🎡',ko:'관람차',d:'커다란 관람차',c:50,give:p=>{ p.friends.push({sp:'apple',kind:'obj',obj:'ferris',lv:3,h:true}); }},
+  {id:'castle',ic:'🏰',ko:'성',d:'멋진 성을 지어요',c:60,give:p=>{ p.friends.push({sp:'apple',kind:'obj',obj:'castle',lv:3,h:true}); }},
+  {id:'d_flower',ic:'🌷',ko:'꽃',d:'마을 꾸미기',c:3,deco:'🌷'},
+  {id:'d_tree',ic:'🌳',ko:'나무',d:'마을 꾸미기',c:4,deco:'🌳'},
+  {id:'d_bear',ic:'🧸',ko:'곰인형',d:'마을 꾸미기',c:6,deco:'🧸'},
+  {id:'d_fountain',ic:'⛲',ko:'분수',d:'마을 꾸미기',c:8,deco:'⛲'},
+  {id:'d_carousel',ic:'🎠',ko:'회전목마',d:'마을 꾸미기',c:10,deco:'🎠'},
+  {id:'d_circus',ic:'🎪',ko:'서커스',d:'마을 꾸미기',c:12,deco:'🎪'},
+  {id:'d_rainbow',ic:'🌈',ko:'무지개',d:'마을 꾸미기',c:12,deco:'🌈'},
+  {id:'d_rocket',ic:'🚀',ko:'로켓',d:'마을 꾸미기',c:15,deco:'🚀'},
+];
+function openShop(){
+  const p=P[who];
+  const m=document.createElement('div'); m.className='modal shopm';
+  const draw=()=>{ const w=wallet(p);
+    m.innerHTML=`<div class="box"><div class="q">🛒 별 상점</div><div class="wallet">내 별 ⭐ <b>${w}</b>개</div>
+      <div class="shop">${SHOP.map(it=>`<button class="sitem press ${w<it.c?'poor':''}" data-buy="${it.id}"><span class="si">${it.ic}</span><b>${it.ko}</b><small>${it.d}</small><span class="price">⭐ ${it.c}</span></button>`).join('')}</div>
+      <div class="ptxt" style="margin-top:6px">별을 써도 알이 생기는 건 그대로예요!</div>
+      <div class="acts"><button class="btn w press" id="shx">닫기</button></div></div>`;
+    m.querySelector('#shx').onclick=()=>{ m.remove(); if(view==='village') rVillage(); };
+    m.querySelectorAll('[data-buy]').forEach(b=>b.onclick=()=>buy(SHOP.find(x=>x.id===b.dataset.buy)));
+  };
+  const buy=it=>{
+    const w=wallet(p);
+    if(w<it.c){ boing(); toast(`별이 ${it.c-w}개 더 필요해요`); say(`별을 ${it.c-w}개 더 모아 볼까요?`); return; }
+    const c=document.createElement('div'); c.className='modal';
+    c.innerHTML=`<div class="box"><div class="q">${it.ic} ${it.ko}<br>별 ${it.c}개로 살까요?</div>
+      <div class="acts"><button class="btn press" id="cy">응! 살래</button><button class="btn w press" id="cn">아니</button></div></div>`;
+    document.body.appendChild(c);
+    c.querySelector('#cn').onclick=()=>c.remove();
+    c.querySelector('#cy').onclick=()=>{
+      c.remove(); p.spent=(p.spent||0)+it.c;
+      if(it.deco) p.decos=(p.decos||[]).concat(it.deco).slice(-40); else it.give(p);
+      p.bought=(p.bought||0)+1; save(); fanfare(); burst(40);
+      say(`${jo(it.ko,'을','를')} 샀어요! 마을에서 확인해 봐요!`); toast(`${it.ic} ${it.ko} 샀어요!`);
+      const n=document.getElementById('starN'); if(n) n.textContent=wallet(p);
+      draw();
+    };
+  };
+  draw(); document.body.appendChild(m);
+}
+/* 전설 친구: 왕 친구 셋 → 전설의 친구 (크기는 그대로, 무지개 빛) */
+function lvName(lv){ return lv>=4?'전설의 ':lv===3?'왕 ':lv===2?'큰 ':''; }
 function egg(col){ return `<svg viewBox="0 0 80 96" aria-hidden="true"><path d="M40 6 C62 6 74 46 72 64 C70 84 56 92 40 92 C24 92 10 84 8 64 C6 46 18 6 40 6 Z" fill="#FFFDF6" stroke="${INK}" stroke-width="3"/>
   <circle cx="28" cy="40" r="6" fill="${col}"/><circle cx="52" cy="58" r="8" fill="${col}"/><circle cx="34" cy="72" r="4.5" fill="${col}"/><circle cx="54" cy="30" r="3.5" fill="${col}"/><ellipse cx="26" cy="24" rx="4" ry="7" fill="#fff" transform="rotate(25 26 24)"/></svg>`; }
 const OBJ={
@@ -692,7 +762,7 @@ function faceOf(k,s){ const ph=P[k].photo; return `<div class="face" style="--s:
 function topbar(){
   const p=P[who];
   return `<div class="top"><button class="me press" data-act="switch" aria-label="다른 사람으로 바꾸기">${faceOf(who,58)}${p.name}<small>바꾸기</small></button>
-    <div class="sp"></div><div class="stars">⭐ <b id="starN">${p.stars}</b></div>${view!=='home'?`<button class="homebtn press" data-act="home" aria-label="처음으로">🏠</button>`:''}</div>`;
+    <div class="sp"></div><div class="stars">⭐ <b id="starN">${wallet(p)}</b></div>${view!=='home'?`<button class="homebtn press" data-act="home" aria-label="처음으로">🏠</button>`:''}</div>`;
 }
 function ensure(p){ const n=Math.floor(p.stars/PER); while(p.spawned<n){ p.friends.push(newFriend()); p.spawned++; } }
 
@@ -713,7 +783,7 @@ function render(){
 function rPick(){
   app.innerHTML=`<div class="pick">${logo()}<div class="ask">누가 할까?</div>
     <div class="players">${S.order.map(k=>`<button class="player press" style="--c:${pc(k)[0]}" data-act="who" data-k="${k}">
-      ${faceOf(k,170)}<div class="nm">${P[k].name}</div><div class="st">⭐ ${P[k].stars}</div></button>`).join('')}</div>
+      ${faceOf(k,170)}<div class="nm">${P[k].name}</div><div class="st">⭐ ${wallet(P[k])}</div></button>`).join('')}</div>
     <div class="hint">내 얼굴을 눌러서 시작해요!</div></div>`;
   const r=document.createElement('button'); r.className='gear rep press'; r.setAttribute('aria-label','부모 리포트'); r.innerHTML='📊<span>리포트</span>'; r.onclick=()=>{ view='report'; render(); }; document.body.appendChild(r);
   const g=document.createElement('button'); g.className='gear press'; g.setAttribute('aria-label','부모 메뉴'); g.textContent='⚙️'; g.onclick=()=>askPin(()=>{ view='parent'; render(); }); document.body.appendChild(g);
@@ -1247,7 +1317,7 @@ function answer(k, el){
     const pr=document.createElement('div'); pr.className='praise';
     pr.innerHTML=`<div class="in"><div class="s">⭐</div><div class="t">정답!</div></div>`;
     document.body.appendChild(pr); setTimeout(()=>pr.remove(),950);
-    const n=document.getElementById('starN'); if(n) n.textContent=P[who].stars;
+    const n=document.getElementById('starN'); if(n) n.textContent=wallet(P[who]);
     let moved=false; const go=()=>{ if(moved) return; moved=true; hush(); Q.i++; if(Q.i>=Q.items.length){ finishRound(); view='done'; render(); } else rQuiz(); };
     hush(); later(go,1300);
     const myQ=Q; setTimeout(()=>{ if(!moved && view==='quiz' && Q===myQ) go(); },6500);
@@ -1305,23 +1375,24 @@ function rVillage(){
   const left=PER-(p.stars%PER), filled=Math.round((p.stars%PER)/PER*10);
   const lv1=p.friends.filter(f=>f.h&&f.kind!=='obj'&&f.lv===1).length;
   const lv2=p.friends.filter(f=>f.h&&f.kind!=='obj'&&f.lv===2).length;
+  const lv3=p.friends.filter(f=>f.h&&f.kind!=='obj'&&f.lv===3).length;
   const plots=p.friends.length? p.friends.map((f,i)=>{
     if(!f.h) return `<div class="plot"><span class="tag lv2">새 알!</span><button class="egg press" data-act="hatch" data-i="${i}" aria-label="알 깨우기">${egg(SP[f.sp].col)}</button><div class="shadow"></div></div>`;
     if(f.kind==='obj') return `<div class="plot"><span class="tag lv2">${OBJ[f.obj].ko}</span><div class="mon" style="--w:${f.obj==='castle'||f.obj==='ferris'?150:118}px" data-act="poke" data-i="${i}">${OBJ[f.obj].svg()}</div><div class="shadow"></div></div>`;
-    const w=f.lv===3?170:f.lv===2?128:88;
-    return `<div class="plot"><span class="tag ${f.lv>1?'lv'+f.lv:''} ${f.sh?'shiny':''}">${f.sh?'✨':''}${f.lv===3?'왕':f.lv===2?'큰 ':''}${SP[f.sp].ko}</span>
-      <div class="mon ${f.sh?'sh':''}" style="--w:${w}px" data-act="poke" data-i="${i}">${f.lv>1?`<span class="crown">${f.lv===3?'👑':'🎀'}</span>`:''}${mon(f.sp)}</div><div class="shadow"></div></div>`;
+    const w=f.lv>=3?170:f.lv===2?128:88;
+    return `<div class="plot"><span class="tag ${f.lv>1?'lv'+f.lv:''} ${f.sh&&f.lv<4?'shiny':''}">${f.lv>=4?'🌈':f.sh?'✨':''}${lvName(f.lv)}${SP[f.sp].ko}</span>
+      <div class="mon ${f.sh?'sh':''} ${f.lv>=4?'leg':''}" style="--w:${w}px" data-act="poke" data-i="${i}">${f.lv>1?`<span class="crown">${f.lv>=4?'🌟':f.lv===3?'👑':'🎀'}</span>`:''}${mon(f.sp)}</div><div class="shadow"></div></div>`;
   }).join('') : `<div class="vempty">별 ${PER}개를 모으면 알이 생겨요 🥚</div>`;
   app.innerHTML=topbar()+`<section class="village">
     <div class="vhead"><div class="ttl">🏡 ${p.name}네 마을</div>
-      ${(lv1>=3||lv2>=3)?`<button class="mergebtn press" data-act="merge">✨ 친구 합치기</button>`:''}<button class="mergebtn press" data-act="bg" style="background:#CFE8FF">🎨 배경</button>
+      ${(lv1>=3||lv2>=3||lv3>=3)?`<button class="mergebtn press" data-act="merge">✨ 친구 합치기</button>`:''}<button class="mergebtn press" data-act="shop" style="background:#FFE680">🛒 상점</button><button class="mergebtn press" data-act="bg" style="background:#CFE8FF">🎨 배경</button>
       <div class="next">⭐ ${left}개 더 모으면 알이 생겨요<div class="bar">${Array.from({length:10},(_,j)=>`<i class="${j<filled?'on':''}"></i>`).join('')}</div></div></div>
     <div class="scene ${sa.cls}" style="${sa.style}">${BG(p.bg).id==='basic'?sky():''}${sa.deco}
       <div class="plots">${mailbox(p)}${plots}${(p.decos||[]).map((d,j)=>`<div class="plot deco"><span class="decoi" style="animation-delay:-${(j*.7)%3}s">${d}</span><div class="shadow"></div></div>`).join('')}</div></div></section>
-    <div class="hint">🔥 연속 ${pStreak(p)}일 공부 중${nb?` · ${nb.need}일이 되면 '${nb.ko}' 배경이 생겨요`:' · 모든 배경을 모았어요! 👑'}<br>친구를 쓰다듬어 봐요 💖 · 우체통에는 하루에 한 번 선물이 와요 · 친구 3명이 모이면 더 크게 바뀔 수 있어요</div>`;
+    <div class="hint">🔥 연속 ${pStreak(p)}일 공부 중${nb?` · ${nb.need}일이 되면 '${nb.ko}' 배경이 생겨요`:' · 모든 배경을 모았어요! 👑'}<br>친구를 쓰다듬어 봐요 💖 · 우체통에는 하루에 한 번 선물이 와요 · 친구 3명이 모이면 더 크게 바뀌어요 · 왕 친구 3명이면 🌈전설의 친구!<br>🛒 상점에서 별로 알과 꾸미기를 살 수 있어요</div>`;
   document.querySelectorAll('.plots .mon').forEach((m,k)=>{ m.style.setProperty('--wx',((k%2?1:-1)*(10+(k*7)%14))+'px'); m.style.animationDelay='-'+((k*1.3)%6).toFixed(1)+'s'; m.classList.add('walk'); });
   document.querySelectorAll('.mon .bob').forEach((b,k)=>b.style.animationDelay='-'+((k*0.37)%1.8).toFixed(2)+'s');
-  if((lv1>=3||lv2>=3) && p.asked!==p.friends.length){ p.asked=p.friends.length; setTimeout(askMerge,700); }
+  if((lv1>=3||lv2>=3||lv3>=3) && p.asked!==p.friends.length){ p.asked=p.friends.length; setTimeout(askMerge,700); }
 }
 const DECOS=['🌷','🌻','🍄','🎈','🪴','🌲','🧸','🎠','⛲','🌈','🏮','🪁','🐞','🦋','🍀','🎪'];
 function isNight(){ const h=new Date().getHours(); return h>=19||h<6; }
@@ -1366,11 +1437,12 @@ function poke(i,el){
 }
 function askMerge(){
   const p=P[who];
-  const lv=p.friends.filter(f=>f.h&&f.kind!=='obj'&&f.lv===2).length>=3?2:1;
+  const cnt=l=>p.friends.filter(f=>f.h&&f.kind!=='obj'&&f.lv===l).length;
+  const lv=cnt(3)>=3?3:cnt(2)>=3?2:1;
   const three=p.friends.map((f,i)=>({f,i})).filter(x=>x.f.h&&x.f.kind!=='obj'&&x.f.lv===lv).slice(0,3);
-  if(three.length<3) return;
-  const m=document.createElement('div'); m.className='modal';
-  m.innerHTML=`<div class="box"><div class="q">친구 셋을 합쳐서<br>더 큰 친구로 만들까?</div>
+  if(three.length<3 || document.querySelector('.mergem')) return;
+  const m=document.createElement('div'); m.className='modal mergem';
+  m.innerHTML=`<div class="box"><div class="q">${lv===3?'왕 친구 셋을 합쳐서<br>🌈 전설의 친구로 만들까?':'친구 셋을 합쳐서<br>더 큰 친구로 만들까?'}</div>
     <div class="three" id="three">${three.map((x,k)=>`<span class="src" style="--dx:${(1-k)*110+170}px">${mon(x.f.sp)}</span>${k<2?'<span class="plus">+</span>':''}`).join('')}<span class="arrow">➜</span><span class="mystery">❓</span></div>
     <div class="acts"><button class="btn press" id="yes">응! 합칠래 ✨</button><button class="btn w press" id="no">그대로 둘래</button></div></div>`;
   document.body.appendChild(m);
@@ -1384,12 +1456,13 @@ function askMerge(){
       let made;
       const shiny=three.some(x=>x.f.sh);
       if(lv===1) made = r<.6 ? {sp:pick(three.map(x=>x.f.sp)),lv:2,h:true,sh:shiny} : {sp:keep,kind:'obj',obj:pick(['house','tree','rainbow','balloon','windmill']),lv:2,h:true};
+      else if(lv===3) made = {sp:pick(three.map(x=>x.f.sp)),lv:4,h:true,sh:shiny};
       else made = r<.5 ? {sp:pick(three.map(x=>x.f.sp)),lv:3,h:true,sh:shiny} : {sp:keep,kind:'obj',obj:pick(['castle','ferris']),lv:3,h:true};
       const idx=new Set(three.map(x=>x.i));
       p.friends=p.friends.filter((_,i)=>!idx.has(i)); p.friends.push(made); save();
-      const name = made.kind==='obj' ? OBJ[made.obj].ko : `${made.lv===3?'왕':'큰'} ${SP[made.sp].ko}`;
+      const name = made.kind==='obj' ? OBJ[made.obj].ko : `${lvName(made.lv)}${SP[made.sp].ko}`;
       m.querySelector('.box').innerHTML=`<div class="q">짜잔! ${name}${made.kind==='obj'?(batchim(name)?'이':'가')+' 생겼어!':' 친구가 됐어!'}</div>
-        <div class="result">${made.kind==='obj'?OBJ[made.obj].svg():mon(made.sp)}</div>
+        <div class="result ${made.lv>=4?'legr':''}">${made.kind==='obj'?OBJ[made.obj].svg():mon(made.sp)}</div>
         <div class="acts"><button class="btn press" id="ok">좋아! 🎉</button></div>`;
       fanfare(); burst(70); say(`짜잔~! ${name}!`);
       m.querySelector('#ok').onclick=()=>{ m.remove(); p.asked=p.friends.length; rVillage(); };
@@ -1414,6 +1487,7 @@ app.addEventListener('click',e=>{
   else if(a==='mail') openMail();
   else if(a==='merge'){ askMerge(); }
   else if(a==='bg'){ openBgPicker(); }
+  else if(a==='shop'){ openShop(); }
 });
 /* ---------- 부모 메뉴 ---------- */
 let pinBuf='';
@@ -1536,7 +1610,7 @@ function parentTop(){
 
 function rParent(){
   const row=k=>{ const p=P[k], t=p.today, done=['ko','en','math'].filter(x=>t[x]).map(x=>({ko:'한글',en:'영어',math:'수학'})[x]);
-    return `<div class="prow">${faceOf(k,80)}<div><div class="pt">${p.name}</div><div class="pd">⭐ ${p.stars} · 친구 ${p.friends.length} · 오늘 끝낸 공부: ${done.length?done.join(', '):'없음'}</div>
+    return `<div class="prow">${faceOf(k,80)}<div><div class="pt">${p.name}</div><div class="pd">⭐ 모은 별 ${p.stars} · 남은 별 ${wallet(p)} · 친구 ${p.friends.length} · 오늘 끝낸 공부: ${done.length?done.join(', '):'없음'}</div>
       <div class="pd" style="margin-top:8px">단계 (최대 ${MAXLV}단계 · 11단계부터 초등 1~2학년 수준)</div>
       <div class="pa" style="margin:4px 0 0">${['ko','en','math'].map(x=>`<span class="lvctl"><button class="sbtn" data-p="lvdn" data-k="${k}" data-s="${x}" aria-label="단계 내리기">−</button><b>${({ko:'한글',en:'영어',math:'수학'})[x]} ${lvOf(p,x)}단계</b><button class="sbtn" data-p="lvup" data-k="${k}" data-s="${x}" aria-label="단계 올리기">＋</button></span>`).join('')}</div>
       <div class="pd" style="margin-top:8px">하루 문제 수</div>
@@ -1575,7 +1649,7 @@ app.addEventListener('click',e=>{
   else if(a==='lvup'||a==='lvdn'){ const x=b.dataset.s; const v=lvOf(P[k],x)+(a==='lvup'?1:-1); P[k].lv[x]=Math.max(1,Math.min(MAXLV,v)); P[k].hist[x]=[]; save(); rParent(); }
   else if(a==='qup'||a==='qdn'){ const x=b.dataset.s, base=roundSize(lvOf(P[k],x)); P[k].qx[x]=Math.max(-2,Math.min(8,qxOf(P[k],x)+(a==='qup'?1:-1))); save(); rParent(); }
   else if(a==='open'){ P[k].today={ko:false,en:false,math:false}; save(); toast(`${P[k].name} 오늘 공부를 다시 열었어요`); rParent(); }
-  else if(a==='plus'||a==='minus'){ P[k].stars=Math.max(0,P[k].stars+(a==='plus'?5:-5)); ensure(P[k]); save(); rParent(); }
+  else if(a==='plus'||a==='minus'){ P[k].stars=Math.max(0,P[k].stars+(a==='plus'?5:-5)); P[k].spent=Math.min(P[k].spent||0,P[k].stars); ensure(P[k]); save(); rParent(); }
   else if(a==='pin'){ S.pin=null; save(); askPin(()=>{ view='parent'; render(); }); }
   else if(a==='backup'){
     const j=JSON.stringify(S), name='today-study-backup-'+dkey()+'.json';
