@@ -566,6 +566,20 @@ button{font:inherit;color:inherit;border:none;background:none;cursor:pointer;-we
   .wrbtn .wt{white-space:nowrap}
 }
 
+/* 간식 · 꾸미기 */
+.ssec{grid-column:1/-1;text-align:left;font-size:22px;margin:8px 0 0;padding-bottom:4px;border-bottom:2px dashed #E8C9DC}
+.facc{position:absolute;top:-8%;right:2%;font-size:calc(var(--w,88px) * .34);line-height:1;transform:rotate(14deg);z-index:3;pointer-events:none}
+.ffood{position:absolute;bottom:4%;left:-6%;font-size:calc(var(--w,88px) * .3);line-height:1;z-index:3;pointer-events:none;animation:yum 2.4s ease-in-out infinite}
+@keyframes yum{50%{transform:translateY(-4px) rotate(-8deg)}}
+.fpick{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:10px;max-height:50vh;overflow:auto;margin-top:12px;padding:6px}
+.fp{border:2.5px solid var(--ink);border-radius:18px;background:#fff;padding:8px 4px;display:flex;flex-direction:column;align-items:center;gap:4px;font-family:inherit;color:var(--ink)}
+.fp .fm{position:relative;display:inline-block;--w:70px}.fp .fm svg{width:70px;height:70px}
+.fp small{font-size:15px}
+.fp.sh svg{filter:drop-shadow(0 0 6px #FFE066)}
+.bonus{font-size:24px;background:#FFF3B0;border:2.5px solid var(--ink);border-radius:999px;padding:6px 18px;display:inline-block;margin-top:6px;animation:lwIn .6s .4s both}
+@keyframes lwIn{0%{opacity:0;transform:translateY(16px) scale(.4)}60%{opacity:1;transform:translateY(-5px) scale(1.12)}100%{opacity:1;transform:none}}
+.result .mon{display:inline-flex}
+@media (max-width:600px){ .ssec{font-size:16px} .facc{font-size:calc(var(--w,88px) * .26)} .ffood{font-size:calc(var(--w,88px) * .23)} .fpick{grid-template-columns:repeat(auto-fill,minmax(84px,1fr));gap:6px} .fp .fm svg{width:54px;height:54px} .fp small{font-size:12px} .bonus{font-size:17px;padding:4px 12px} }
 </style>
 </head>
 <body>
@@ -775,30 +789,52 @@ function newFriend(){ return {sp:pickSp(),lv:1,h:false,sh:Math.random()<.07}; }
 /* ---------- 별 상점 ---------- */
 /* p.stars = 지금까지 모은 별(알 생기기 기준), p.spent = 상점에서 쓴 별 */
 function wallet(p){ return Math.max(0,(p.stars||0)-(p.spent||0)); }
+/* ---------- 간식 · 친구 꾸미기 · 마을 장식 ---------- */
+const FOODS=[['🍓','딸기',2],['🍎','사과',2],['🍌','바나나',2],['🥕','당근',2],['🍪','쿠키',3],['🍭','막대사탕',3],['🧃','주스',3],['🍩','도넛',4],['🍫','초콜릿',4],['🍙','주먹밥',4],['🍿','팝콘',4],['🧁','컵케이크',5],['🍦','아이스크림',5],['🍉','수박',5],['🍮','푸딩',5],['🍡','떡꼬치',5],['🍰','케이크',6],['🍕','피자',6],['🍔','햄버거',6],['🥞','팬케이크',6]];
+const ACCS=[['🎀','리본',4],['🌸','꽃핀',4],['⭐','별핀',4],['🍀','네잎클로버',5],['🦋','나비핀',5],['🧢','야구 모자',6],['👒','밀짚모자',6],['🕶️','선글라스',7],['🎧','헤드폰',8],['🧣','목도리',8],['🎩','신사 모자',9],['🎓','학사모',10],['👑','왕관',15]];
+const SHOP_DECO=[['🌷','튤립',3],['🍄','버섯',3],['🦋','나비',3],['🌳','나무',4],['🌹','장미',4],['🌻','해바라기',4],['🌵','선인장',4],['🌴','야자수',5],['🪁','연',5],['🏮','등불',5],['🧸','곰인형',6],['🎏','잉어 깃발',6],['🛹','스케이트보드',6],['🚲','자전거',6],['🎃','호박',6],['⛺','텐트',7],['⛲','분수',8],['🛶','카누',8],['⛄','눈사람',8],['🦩','플라밍고',8],['🎠','회전목마',10],['🎄','트리',10],['🎪','서커스',12],['🌈','무지개',12],['🚀','로켓',15],['🗼','탑',20],['🏯','성탑',25]];
+const DECO_POOL=['🌷','🌻','🌹','🌼','💐','🌺','🌸','🍀','🌵','🌴','🌲','🌳','🍄','🌾',
+  '🐞','🦋','🐝','🐌','🐿️','🦔','🐇','🐤','🦆','🐢','🐸','🦩','🦚','🦜','🐠',
+  '🎈','🪁','🧸','🎠','🎪','⛲','🛹','🛴','🚲','🪀','🧩','🏀','⚽','🎳','🎨',
+  '🏮','🎏','🎐','⛺','🏕️','🗼','🏯','⛩️','🛶','⛵','🚂','🧺','🪑','🛋️','💡','🔭','🎁','🕯️','🌈','🎡','🎢'];
+const SEASON_DECO={spring:['🌸','🌷','🐣','🦋','🌱','🍓'],summer:['🍉','⛱️','🐚','🏖️','🍦','🌻'],fall:['🍁','🍂','🎃','🌰','🍎','🌾'],winter:['⛄','❄️','🎄','🧤','☃️','🎁']};
+function seasonKey(){ const m=new Date().getMonth()+1; return m>=3&&m<=5?'spring':m<=8&&m>=6?'summer':m>=9&&m<=11?'fall':'winter'; }
+function pickDeco(){ return Math.random()<.3 ? pick(SEASON_DECO[seasonKey()]) : pick(DECO_POOL); }
+const ITEM_KO=Object.fromEntries(FOODS.concat(ACCS).map(x=>[x[0],x[1]]));
+/* 합치면 덤으로: 꾸미기 물품이나 간식 하나 */
+function mergeBonus(made,srcs){
+  if(made.kind==='obj') return null;
+  srcs.forEach(f=>{ if(f.acc&&!made.acc) made.acc=f.acc; if(f.food&&!made.food) made.food=f.food; });
+  if(Math.random()>=.8 || (made.acc&&made.food)) return null;
+  const useAcc=made.acc?false:made.food?true:Math.random()<.5, x=useAcc?pick(ACCS):pick(FOODS);
+  if(useAcc) made.acc=x[0]; else made.food=x[0];
+  return {k:useAcc?'acc':'food',e:x[0],ko:x[1]};
+}
+const itemSpans=f=>(f.acc?`<span class="facc">${f.acc}</span>`:'')+(f.food?`<span class="ffood">${f.food}</span>`:'');
 const SHOP=[
+  {sec:'🥚 친구 알'},
   {id:'egg',ic:'🥚',ko:'친구 알',d:'어떤 친구가 나올까?',c:10,give:p=>{ p.friends.push(newFriend()); }},
   {id:'rare',ic:'🦄',ko:'귀한 알',d:'귀한 친구가 꼭 나와요',c:35,give:p=>{ const f=newFriend(); const r=SP_LIST.filter(k=>SP[k].r); if(r.length) f.sp=pick(r); p.friends.push(f); }},
   {id:'shiny',ic:'🌟',ko:'반짝 알',d:'반짝반짝 친구가 꼭 나와요',c:40,give:p=>{ const f=newFriend(); f.sh=true; p.friends.push(f); }},
+  {sec:'🍰 간식 · 친구에게 줘요'},
+  ...FOODS.map(([e,k,c])=>({id:'f_'+k,ic:e,ko:k,d:'냠냠 간식',c,food:e})),
+  {sec:'🎀 꾸미기 · 친구에게 씌워 줘요'},
+  ...ACCS.map(([e,k,c])=>({id:'a_'+k,ic:e,ko:k,d:'친구 꾸미기',c,acc:e})),
+  {sec:'🏠 마을 건물'},
   {id:'house',ic:'🏠',ko:'작은 집',d:'마을에 집을 지어요',c:20,give:p=>{ p.friends.push({sp:'apple',kind:'obj',obj:'house',lv:2,h:true}); }},
   {id:'windmill',ic:'🌬️',ko:'풍차',d:'빙글빙글 풍차',c:20,give:p=>{ p.friends.push({sp:'apple',kind:'obj',obj:'windmill',lv:2,h:true}); }},
   {id:'balloon',ic:'🎈',ko:'열기구',d:'하늘을 나는 열기구',c:25,give:p=>{ p.friends.push({sp:'apple',kind:'obj',obj:'balloon',lv:2,h:true}); }},
   {id:'ferris',ic:'🎡',ko:'관람차',d:'커다란 관람차',c:50,give:p=>{ p.friends.push({sp:'apple',kind:'obj',obj:'ferris',lv:3,h:true}); }},
   {id:'castle',ic:'🏰',ko:'성',d:'멋진 성을 지어요',c:60,give:p=>{ p.friends.push({sp:'apple',kind:'obj',obj:'castle',lv:3,h:true}); }},
-  {id:'d_flower',ic:'🌷',ko:'꽃',d:'마을 꾸미기',c:3,deco:'🌷'},
-  {id:'d_tree',ic:'🌳',ko:'나무',d:'마을 꾸미기',c:4,deco:'🌳'},
-  {id:'d_bear',ic:'🧸',ko:'곰인형',d:'마을 꾸미기',c:6,deco:'🧸'},
-  {id:'d_fountain',ic:'⛲',ko:'분수',d:'마을 꾸미기',c:8,deco:'⛲'},
-  {id:'d_carousel',ic:'🎠',ko:'회전목마',d:'마을 꾸미기',c:10,deco:'🎠'},
-  {id:'d_circus',ic:'🎪',ko:'서커스',d:'마을 꾸미기',c:12,deco:'🎪'},
-  {id:'d_rainbow',ic:'🌈',ko:'무지개',d:'마을 꾸미기',c:12,deco:'🌈'},
-  {id:'d_rocket',ic:'🚀',ko:'로켓',d:'마을 꾸미기',c:15,deco:'🚀'},
+  {sec:'🌷 마을 꾸미기'},
+  ...SHOP_DECO.map(([e,k,c])=>({id:'d_'+k,ic:e,ko:k,d:'마을 꾸미기',c,deco:e})),
 ];
 function openShop(){
   const p=P[who];
   const m=document.createElement('div'); m.className='modal shopm';
   const draw=()=>{ const w=wallet(p);
     m.innerHTML=`<div class="box"><div class="q">🛒 별 상점</div><div class="wallet">내 별 ⭐ <b>${w}</b>개</div>
-      <div class="shop">${SHOP.map(it=>`<button class="sitem press ${w<it.c?'poor':''}" data-buy="${it.id}"><span class="si">${it.ic}</span><b>${it.ko}</b><small>${it.d}</small><span class="price">⭐ ${it.c}</span></button>`).join('')}</div>
+      <div class="shop">${SHOP.map(it=>it.sec?`<div class="ssec">${it.sec}</div>`:`<button class="sitem press ${w<it.c?'poor':''}" data-buy="${it.id}"><span class="si">${it.ic}</span><b>${it.ko}</b><small>${it.d}</small><span class="price">⭐ ${it.c}</span></button>`).join('')}</div>
       <div class="ptxt" style="margin-top:6px">별을 써도 알이 생기는 건 그대로예요!</div>
       <div class="acts"><button class="btn w press" id="shx">닫기</button></div></div>`;
     m.querySelector('#shx').onclick=()=>{ m.remove(); if(view==='village') rVillage(); };
@@ -807,6 +843,27 @@ function openShop(){
   const buy=it=>{
     const w=wallet(p);
     if(w<it.c){ boing(); toast(`별이 ${it.c-w}개 더 필요해요`); say(`별을 ${it.c-w}개 더 모아 볼까요?`); return; }
+    if(it.food||it.acc){ /* 간식 · 꾸미기는 줄 친구를 고르면 바로 사요 */
+      const list=p.friends.map((f,i)=>({f,i})).filter(x=>x.f.h&&x.f.kind!=='obj');
+      if(!list.length){ boing(); toast('먼저 알을 깨워서 친구를 만나요!'); return; }
+      const c=document.createElement('div'); c.className='modal';
+      c.innerHTML=`<div class="box"><div class="q">${it.ic} ${it.ko}<br>누구에게 ${it.food?'줄까':'씌워 줄까'}?</div><div class="ptxt" style="font-size:20px">별 ${it.c}개를 써요</div>
+        <div class="fpick">${list.map(x=>`<button class="fp press ${x.f.sh?'sh':''}" data-fi="${x.i}"><span class="fm">${mon(x.f.sp)}${itemSpans(x.f)}</span><small>${lvName(x.f.lv)}${SP[x.f.sp].ko}</small></button>`).join('')}</div>
+        <div class="acts"><button class="btn w press" id="cn">그만둘래</button></div></div>`;
+      document.body.appendChild(c); say(`${it.ko}, 누구에게 ${it.food?'줄까요':'씌워 줄까요'}?`);
+      c.querySelector('#cn').onclick=()=>c.remove();
+      c.querySelectorAll('[data-fi]').forEach(b=>b.onclick=()=>{
+        const fr=p.friends[+b.dataset.fi]; c.remove(); p.spent=(p.spent||0)+it.c;
+        if(it.food) fr.food=it.food; else fr.acc=it.acc;
+        p.bought=(p.bought||0)+1; save(); fanfare(); burst(40);
+        const nm=SP[fr.sp].ko;
+        say(it.food?`${nm} 친구가 ${jo(it.ko,'을','를')} 받았어요! 냠냠, 고마워!`:`${nm} 친구가 ${jo(it.ko,'을','를')} 썼어요! 정말 멋져요!`);
+        toast(`${it.ic} ${nm}에게 ${it.food?'줬어요':'씌워 줬어요'}!`);
+        const n=document.getElementById('starN'); if(n) n.textContent=wallet(p);
+        draw();
+      });
+      return;
+    }
     const c=document.createElement('div'); c.className='modal';
     c.innerHTML=`<div class="box"><div class="q">${it.ic} ${it.ko}<br>별 ${it.c}개로 살까요?</div>
       <div class="acts"><button class="btn press" id="cy">응! 살래</button><button class="btn w press" id="cn">아니</button></div></div>`;
@@ -814,7 +871,7 @@ function openShop(){
     c.querySelector('#cn').onclick=()=>c.remove();
     c.querySelector('#cy').onclick=()=>{
       c.remove(); p.spent=(p.spent||0)+it.c;
-      if(it.deco) p.decos=(p.decos||[]).concat(it.deco).slice(-40); else it.give(p);
+      if(it.deco) p.decos=(p.decos||[]).concat(it.deco).slice(-60); else it.give(p);
       p.bought=(p.bought||0)+1; save(); fanfare(); burst(40);
       say(`${jo(it.ko,'을','를')} 샀어요! 마을에서 확인해 봐요!`); toast(`${it.ic} ${it.ko} 샀어요!`);
       const n=document.getElementById('starN'); if(n) n.textContent=wallet(p);
@@ -1618,7 +1675,7 @@ function rVillage(){
     if(f.kind==='obj') return `<div class="plot"><span class="tag lv2">${OBJ[f.obj].ko}</span><div class="mon" style="--w:${f.obj==='castle'||f.obj==='ferris'?150:118}px" data-act="poke" data-i="${i}">${OBJ[f.obj].svg()}</div><div class="shadow"></div></div>`;
     const w=f.lv>=3?170:f.lv===2?128:88;
     return `<div class="plot"><span class="tag ${f.lv>1?'lv'+f.lv:''} ${f.sh&&f.lv<4?'shiny':''}">${f.lv>=4?'🌈':f.sh?'✨':''}${lvName(f.lv)}${SP[f.sp].ko}</span>
-      <div class="mon ${f.sh?'sh':''} ${f.lv>=4?'leg':''}" style="--w:${w}px" data-act="poke" data-i="${i}">${f.lv>1?`<span class="crown">${f.lv>=4?'🌟':f.lv===3?'👑':'🎀'}</span>`:''}${mon(f.sp)}</div><div class="shadow"></div></div>`;
+      <div class="mon ${f.sh?'sh':''} ${f.lv>=4?'leg':''}" style="--w:${w}px" data-act="poke" data-i="${i}">${f.lv>1?`<span class="crown">${f.lv>=4?'🌟':f.lv===3?'👑':'🎀'}</span>`:''}${mon(f.sp)}${itemSpans(f)}</div><div class="shadow"></div></div>`;
   }).join('') : `<div class="vempty">별 ${PER}개를 모으면 알이 생겨요 🥚</div>`;
   app.innerHTML=topbar()+`<section class="village">
     <div class="vhead"><div class="ttl">🏡 ${p.name}네 마을</div>
@@ -1631,7 +1688,7 @@ function rVillage(){
   document.querySelectorAll('.mon .bob').forEach((b,k)=>b.style.animationDelay='-'+((k*0.37)%1.8).toFixed(2)+'s');
   if((lv1>=3||lv2>=3||lv3>=3) && p.asked!==p.friends.length){ p.asked=p.friends.length; setTimeout(askMerge,700); }
 }
-const DECOS=['🌷','🌻','🍄','🎈','🪴','🌲','🧸','🎠','⛲','🌈','🏮','🪁','🐞','🦋','🍀','🎪'];
+
 function isNight(){ const h=new Date().getHours(); return h>=19||h<6; }
 function sky(){
   const m=new Date().getMonth()+1, night=isNight();
@@ -1649,7 +1706,7 @@ function mailbox(p){
 function openMail(){
   const p=P[who];
   if(p.mail===dkey()){ boing(); toast('선물은 내일 또 와요'); return; }
-  const d=pick(DECOS); p.mail=dkey(); p.decos=(p.decos||[]).concat(d).slice(-30); save();
+  const d=pickDeco(); p.mail=dkey(); p.decos=(p.decos||[]).concat(d).slice(-60); save();
   const m=document.createElement('div'); m.className='modal';
   m.innerHTML=`<div class="box"><div class="q">오늘의 선물이 왔어요!</div><div class="result" style="font-size:150px;line-height:1.1">${d}</div><div class="acts"><button class="btn press" id="mok">마을에 놓기</button></div></div>`;
   document.body.appendChild(m); fanfare(); burst(30);
@@ -1668,9 +1725,10 @@ function poke(i,el){
   const hrt=document.createElement('span'); hrt.className='heart'; hrt.textContent=pick(['💖','💕','💗','✨']); el.appendChild(hrt); setTimeout(()=>hrt.remove(),1100);
   el.querySelectorAll('.say').forEach(s=>s.remove());
   const name=f.kind==='obj'?OBJ[f.obj].ko:SP[f.sp].ko;
-  const s=document.createElement('div'); s.className='say'; s.textContent=f.sp==='poop'&&f.kind!=='obj'?'뿌직! 😆':`안녕! 나는 ${name}!`;
+  const yum=f.kind!=='obj'&&f.food&&Math.random()<.5, cool=!yum&&f.kind!=='obj'&&f.acc&&Math.random()<.4;
+  const s=document.createElement('div'); s.className='say'; s.textContent=yum?`${f.food} 냠냠! 맛있어!`:cool?`${f.acc} 나 멋지지?`:f.sp==='poop'&&f.kind!=='obj'?'뿌직! 😆':`안녕! 나는 ${name}!`;
   el.appendChild(s); setTimeout(()=>s.remove(),1800);
-  say(f.sp==='poop'&&f.kind!=='obj'?'뿌직! 히히~':`안녕~ 나는 ${jo(name,'이야','야')}!`);
+  say(yum?`냠냠! ${ITEM_KO[f.food]||'간식'} 정말 맛있어!`:cool?`${ITEM_KO[f.acc]||'꾸미기'} 어때? 나 멋지지?`:f.sp==='poop'&&f.kind!=='obj'?'뿌직! 히히~':`안녕~ 나는 ${jo(name,'이야','야')}!`);
 }
 function askMerge(){
   const p=P[who];
@@ -1695,13 +1753,15 @@ function askMerge(){
       if(lv===1) made = r<.6 ? {sp:pick(three.map(x=>x.f.sp)),lv:2,h:true,sh:shiny} : {sp:keep,kind:'obj',obj:pick(['house','tree','rainbow','balloon','windmill']),lv:2,h:true};
       else if(lv===3) made = {sp:pick(three.map(x=>x.f.sp)),lv:4,h:true,sh:shiny};
       else made = r<.5 ? {sp:pick(three.map(x=>x.f.sp)),lv:3,h:true,sh:shiny} : {sp:keep,kind:'obj',obj:pick(['castle','ferris']),lv:3,h:true};
+      const bonus=mergeBonus(made,three.map(x=>x.f));
       const idx=new Set(three.map(x=>x.i));
       p.friends=p.friends.filter((_,i)=>!idx.has(i)); p.friends.push(made); save();
       const name = made.kind==='obj' ? OBJ[made.obj].ko : `${lvName(made.lv)}${SP[made.sp].ko}`;
       m.querySelector('.box').innerHTML=`<div class="q">짜잔! ${name}${made.kind==='obj'?(batchim(name)?'이':'가')+' 생겼어!':' 친구가 됐어!'}</div>
-        <div class="result ${made.lv>=4?'legr':''}">${made.kind==='obj'?OBJ[made.obj].svg():mon(made.sp)}</div>
+        <div class="result ${made.lv>=4?'legr':''}"><span class="mon" style="--w:180px">${made.kind==='obj'?OBJ[made.obj].svg():mon(made.sp)+itemSpans(made)}</span></div>
+        ${bonus?`<div class="bonus">🎁 덤으로 <b>${bonus.e} ${bonus.ko}</b>${bonus.k==='acc'?'도 쓰고 있어요!':'도 들고 왔어요!'}</div>`:''}
         <div class="acts"><button class="btn press" id="ok">좋아! 🎉</button></div>`;
-      fanfare(); burst(70); say(`짜잔~! ${name}!`);
+      fanfare(); burst(70); say(`짜잔~! ${name}!`+(bonus?` ${bonus.ko}도 생겼어요!`:''));
       m.querySelector('#ok').onclick=()=>{ m.remove(); p.asked=p.friends.length; rVillage(); };
     },750);
   };
